@@ -749,7 +749,7 @@ Below, we will see the mitigations for both attacks.
 
 ##### a) DTP and trunk mitigation
 
-DTP is a Cisco proprietary protocol used to set a switch port automatically in trunk or access mode. Unfortunately this feature allows an attacker to get access to all VLANs of a switch if he can send a DTP message to have his port configure in trunk with all the VLANs allowed by default.
+DTP is a Cisco proprietary protocol used to set a switch port automatically in trunk or access mode. Unfortunately this feature allows an attacker to get access to all VLANs of a switch if he can send a DTP message to have his port configured in trunk with all the VLANs allowed by default.
 
 Note: Disabling the DTP protocol also reduces the ability for an attacker to identify a switch. This is because DTP messages contain the OUI of a MAC address, which allows the manufacturer's name to be identified. What is more DTP being a proprietary protocol then the device sending those messages is mostly a Cisco switch.
 
@@ -757,9 +757,9 @@ To mitigate this we can either:
 
 ###### a.1) Configure ports in access mode (that disables DTP)
 
-Enabling access mode of switch ports disables DTP so no DTP specific command is needed. The port configured in access mode cannot become a trunk so VLAN hopping with DTP is not possible.
+Enabling access mode of switch ports disables DTP so we don't need to type a DTP specific command. The port configured in access mode cannot become a trunk so VLAN hopping with DTP is not possible.
 
-Remeber: do not leave a port unconfigured since it will be in auto-mode (and can become a trunk). Either shutdown switch ports or configure them in access mode disabling DTP.
+Remember: do not leave a port unconfigured since it will be in auto-mode (and can become a trunk). Either shutdown switch ports or configure them in access mode disabling DTP.
 
 ``` pascal
 switchport mode access
