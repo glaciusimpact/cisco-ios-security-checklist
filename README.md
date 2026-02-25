@@ -31,8 +31,8 @@ Below is a checklist of measures to strengthen the security of Cisco switches an
 - [ ] [8. VLAN Attack Protection](#8-vlan-attack-protection)
 	- [ ] [8.1 VTP mode transparent](#81-vtp-mode-transparent)
 	- [ ] [8.2 VLAN hopping](#82-vlan-hopping)
-- [ ] [9. Monitoring Protection]
-	- [ ] 9.1 SNMPv3
+- [ ] [9. Monitoring Protection](#9-monitoring-protection)
+	- [ ] [9.1 SNMPv3](#91-snmpv3)
 
 Reference:
 - [Cisco IOS Encryption/Hash](#cisco-ios-encryptionhash)
@@ -900,7 +900,7 @@ Since the problem is because an access VLAN port is configured with the same VLA
 
 To mitigate this issue we can (choose one):
 - set a different/dedicated VLAN for the trunk native VLAN
-- use a different VLAN ID for access mode port
+- use a different VLAN ID for access mode ports
 - tag native VLAN
 
 
@@ -927,7 +927,7 @@ Switch(config-if)#
 </details>
 
 
-###### b.2) Changing the native VLAN of trunks
+###### b.2) Using a different VLAN ID for access mode ports
 
 You can choose this solution but do not forget to set up a VLAN different to the native VLAN everytime you have cleared the configuration of a switch port. A little bit more risky than the previous solution. Those 2 first solutions can be combined. 
 
@@ -947,13 +947,18 @@ Switch(config-if)#
 
 ###### b.3) Tagging native VLAN
 
-This command is not supported by all Cisco switches. Should be run in config mode.
+This command is not supported by all Cisco switches. It should be run in config mode.
 
 ``` pascal
 Switch(config)# vlan dot1q tag native
 ```
 
 ### 9. Monitoring Protection
+
+#### 9.1 SNMPv3
+
+Prefer always SNMPv3 over any other older version of SNMP. This monitoring protocol provides security using authentication and encryption of data.
+
 
 ---
 
