@@ -983,7 +983,7 @@ An ACL to protect access to SNMP requests from unexpected IP addresses could lik
 
 ``` pascal
 ip access-list extended MyACL
-permit udp 192.168.0.123 0.0.0.0 eq snmp host 192.168.0.100
+permit udp host 192.168.0.123 eq snmp host 192.168.0.100
 ```
 
 - `192.168.0.123`: IP address of the remote computer/monitoring server.
@@ -994,7 +994,7 @@ permit udp 192.168.0.123 0.0.0.0 eq snmp host 192.168.0.100
 
 ``` python
 Switch(config)#ip access-list extended MyACL
-Switch(config-ext-nacl)#permit udp 192.168.0.123 0.0.0.0 eq snmp host 192.168.0.100
+Switch(config-ext-nacl)#permit udp host 192.168.0.123 eq snmp host 192.168.0.100
 Switch(config-ext-nacl)#
 ```
 </details>
