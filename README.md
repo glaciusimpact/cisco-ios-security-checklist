@@ -959,6 +959,25 @@ Switch(config)# vlan dot1q tag native
 
 Prefer always SNMPv3 over any other older version of SNMP. This monitoring protocol provides security using authentication and encryption of data.
 
+It is a good practice to use ACL with allowed IP addresses accessing SNMP OIDs.
+
+Here is an example of SNMPv3 configuration using SHA+AES:
+
+``` pascal
+Switch(config)#snmp-server group MyGroup v3 priv 
+Switch(config)#snmp-server user myuser MyGroup v3 auth sha MySuperPassword123. priv aes 128 MySuperPassword456.
+```
+
+Feel free to change the value of AES encyption (128 to 192 or better 256) if you can.
+
+The ACL to protect access to SNMP requests from unexpected IP addreses could like this:
+
+``` pascal
+Switch(config)#ip access-list extended MyACL
+Switch(config-ext-nacl)#permit udp 192.168.0.123 0.0.0.0 eq snmp host 192.168.0.100 
+Switch(config-ext-nacl)#
+```
+
 
 ---
 
