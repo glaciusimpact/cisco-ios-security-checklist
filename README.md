@@ -724,7 +724,7 @@ ip dhcp snooping trust
 VTP is not recommended any longer by Cisco. It can potentially destroy the VLANs of a switch. If the VTP of a switch is configured in transparent mode it is not vulnerable to a VTP attack or misconfiguration and its VLAN configuration is stored in the running config and not any longer in vlan.dat.
 
 ``` pascal
-SW1(config)#vtp mode transparent
+vtp mode transparent
 ```
 
 <details>
@@ -742,18 +742,155 @@ SW1(config)#
 VLAN hopping is the ability for an attacker to access a network in a VLAN that he shouldn't be able to reach.
 
 To perform a VLAN hopping there are 2 techniques:
-1. by using the Dynamic Trunking Protocol (DTP) which allows a port to be in trunk mode, or by leaving a port configured in trunk mode accessible without filtering VLANs
-2. by using double VLAN tagging
+1. by using the Dynamic Trunking Protocol (DTP) which allows a port to be in trunk mode, or by leaving a port configured in trunk mode accessible without filtering VLANs. This is also called switch spoofing.
+2. by using double VLAN tagging.
 
 Below, we will see the mitigations for both attacks.
 
 ##### a) DTP and trunk mitigation
 
-DTP is a Cisco proprietary protocol used to set a switch port automatically in trunk or access mode.
+DTP is a Cisco proprietary protocol used to set a switch port automatically in trunk or access mode. Unfortunately this feature allows an attacker to get access to all VLANs of a switch if he can send a DTP message to have his port configure in trunk with all the VLANs allowed by default.
 
-Disabling the DTP protocol also reduces the ability to identify a switch. This is because DTP messages contain the MAC address OUI, which allows the manufacturer's name to be identified.
+Note: Disabling the DTP protocol also reduces the ability for an attacker to identify a switch. This is because DTP messages contain the OUI of a MAC address, which allows the manufacturer's name to be identified. What is more DTP being a proprietary protocol then the device sending those messages is mostly a Cisco switch.
 
-##### b) Double tagging
+To mitigate this we can either:
+
+###### a.1) Configure ports in access mode (that disables DTP)
+
+Enabling access mode of switch ports disables DTP so no DTP specific command is needed. The port configured in access mode cannot become a trunk so VLAN hopping with DTP is not possible.
+
+Remeber: do not leave a port unconfigured since it will be in auto-mode (and can become a trunk). Either shutdown switch ports or configure them in access mode disabling DTP.
+
+``` pascal
+switchport mode access
+```
+
+<details>
+<summary>Output</summary>
+
+``` python
+Switch#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#int gi1/0/2
+Switch(config-if)#switchport mode access 
+Switch(config-if)#do show interface gi1/0/2 switchport
+Name: Gig1/0/2
+Switchport: Enabled
+Administrative Mode: static access
+Operational Mode: static access
+Administrative Trunking Encapsulation: dot1q
+Operational Trunking Encapsulation: native
+Negotiation of Trunking: Off
+Access Mode VLAN: 1 (default)
+Trunking Native Mode VLAN: 1 (default)
+Voice VLAN: none
+Administrative private-vlan host-association: none
+Administrative private-vlan mapping: none
+Administrative private-vlan trunk native VLAN: none
+Administrative private-vlan trunk encapsulation: dot1q
+Administrative private-vlan trunk normal VLANs: none
+Administrative private-vlan trunk private VLANs: none
+Operational private-vlan: none
+Trunking VLANs Enabled: All
+Pruning VLANs Enabled: 2-1001
+Capture Mode Disabled
+Capture VLANs Allowed: ALL
+Protected: false
+Appliance trust: none
+
+
+Switch(config-if)#
+```
+
+-> We get:
+
+```
+Administrative Mode: static access
+Negotiation of Trunking: Off
+```
+
+instead of:
+
+```
+Administrative Mode: dynamic auto
+Negotiation of Trunking: On
+```
+
+which is good!
+</details>
+
+###### a.2) Disable DTP protocol on trunk ports
+
+Sometimes we cannot use access ports but trunk ports to connect devices to the switch. If a port is configured in trunk mode then DTP is enable by default. We can disable DTP on a trunk port which removes those messages to an attacker. But the VLAN hopping problem in trunk mode does not come from the DTP. Actually an attacker can send packets with all VLANS he wants if no VLAN filtering is set on a trunk port so VLAN hopping is still possible. So here we are going to configure a trunk, disable DTP messages and filter VLANs (VLAN 1, 2, 3, 4, 5 and 7 other VLANs will be blocked).
+
+Note: it is not possible to disable DTP globally or on a port without specifying a mode. 
+
+``` pascal
+switchport mode trunk
+switchport nonegotiate
+switchport trunk allowed vlan 1-5,7
+```
+
+<details>
+<summary>Output</summary>
+
+``` python
+Switch(config)#int gigabitEthernet 1/0/5
+Switch(config-if)#switchport mode trunk
+
+Switch(config-if)#
+%LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1/0/5, changed state to down
+
+%LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1/0/5, changed state to up
+
+Switch(config-if)#switchport nonegotiate
+Switch(config-if)#switchport trunk allowed vlan 1-5,7
+Switch(config-if)#do show int gi1/0/5 switchport
+Name: Gig1/0/5
+Switchport: Enabled
+Administrative Mode: trunk
+Operational Mode: trunk
+Administrative Trunking Encapsulation: dot1q
+Operational Trunking Encapsulation: dot1q
+Negotiation of Trunking: Off
+Access Mode VLAN: 1 (default)
+Trunking Native Mode VLAN: 1 (default)
+Voice VLAN: none
+Administrative private-vlan host-association: none
+Administrative private-vlan mapping: none
+Administrative private-vlan trunk native VLAN: none
+Administrative private-vlan trunk encapsulation: dot1q
+Administrative private-vlan trunk normal VLANs: none
+Administrative private-vlan trunk private VLANs: none
+Operational private-vlan: none
+Trunking VLANs Enabled: 1-5,7
+Pruning VLANs Enabled: 2-1001
+Capture Mode Disabled
+Capture VLANs Allowed: ALL
+Protected: false
+Appliance trust: none
+
+
+Switch(config-if)#
+```
+->
+
+We get:
+
+```
+Negotiation of Trunking: Off
+Trunking VLANs Enabled: 1-5,7
+```
+
+instead of:
+
+```
+Negotiation of Trunking: On
+Trunking VLANs Enabled: All
+```
+</details>
+
+##### b) Double tagging mitigation
 
 
 ### 9. Monitoring Protection
