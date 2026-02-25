@@ -894,13 +894,13 @@ Trunking VLANs Enabled: All
 
 VLAN hopping via double tagging is possible if an attacker is connected to an **access port** of a switch configured with a VLAN identical to the native VLAN of a port connected to a switch. As you might have guessed, a second switch is needed for the attack. The packet sent by the attacker contains two VLAN tags: the first one which uses the same ID as the native VLAN and a second VLAN tag which is the VLAN ID of the target. The VLAN tags are not removed on the access port but once arrived to a trunk port facing another switch then the first tag is removed (the one identical to the native VLAN) then the frame is crossing the link to the other switch using the native VLAN. Arrived at the second switch trunk port the switch removes the second VLAN an put the frame into the second VLAN. Thus the frame has made a "hop" to the second VLAN defined in the frame sent and continues its journey till reaching the target.
 
-Note: this attack is possible in one way; the attacker cannot receive data from the target. But that can be enough to DoS a server.
+Note: this is a one-way attack; the attacker can send but cannot receive data from the target. But that can be enough to DoS a server.
 
-Since the problem is because an access VLAN port can be the same as a native VLAN then both of them should be different.
+Since the problem is because an access VLAN port is configured with the same VLAN ID as a native VLAN then both of them should be different.
 
-To mitigate this issue one can (choose one):
-- Set a different/dedicated VLAN for the trunk native VLAN
-- Use a different VLAN ID for access mode port
+To mitigate this issue we can (choose one):
+- set a different/dedicated VLAN for the trunk native VLAN
+- use a different VLAN ID for access mode port
 - tag native VLAN
 
 
@@ -929,7 +929,7 @@ Switch(config-if)#
 
 ###### b.2) Changing the native VLAN of trunks
 
-You can choose this solution but do not forget to set up a VLAN different to the native VLAN. 
+You can choose this solution but do not forget to set up a VLAN different to the native VLAN everytime you have cleared the configuration of a switch port. A little bit more risky than the previous solution. Those 2 first solutions can be combined. 
 
 ``` pascal
 switchport access vlan 123
