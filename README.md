@@ -16,7 +16,7 @@ Below is a checklist of measures to strengthen the security of Cisco switches an
 	- [ ] [3.3 Secure Console access](#33-secure-console-access)
 - [ ] [4. Secure remote management access](#4-secure-remote-management-access)
 	- [ ] [4.1 Enable and setup SSH](#41-enable-and-setup-ssh)
-	- [ ] [4.2 Protect SSH access with ACL](#42-protect-ssh-access-with-acl)
+	- [ ] [4.2 Protect management access with an ACL](#42-protect-management-access-with-an-acl)
 	- [ ] [4.3 Radius access](#43-radius-access)
 - [ ] [5. Preventing loops](#5-preventing-loops)
 	- [ ] [5.1 Spanning-tree](#51-spanning-tree)
@@ -346,10 +346,44 @@ SW1#
 
 ---
 
-#### 4.2 Protect SSH access with ACL
+#### 4.2 Protect management access with an ACL
 
+Adding an ACL to the management access of the switch reduces the risk of unauthorized access. In the example below only the host 192.168.0.100 is allowed to reach the management interface of the switch using TCP protocol and port 22.
 
+``` pascal
+ip access-list extended vty_acl
+permit tcp host 192.168.0.100 any eq 22
+deny ip any any
+exit
+line vty 0 15
+access-class vty_acl in
+```
 
+<details>
+<summary>Output</summary>
+
+``` python
+SW1#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+SW1(config)#ip access-list extended vty_acl
+SW1(config-ext-nacl)#permit tcp host 192.168.0.100 any eq 22
+SW1(config-ext-nacl)#deny ip any any
+SW1(config-ext-nacl)#exit
+SW1(config)#line vty 0 15
+SW1(config-line)#access-class vty_acl in
+SW1(config-line)#exit
+SW1(config)#exit
+SW1#
+%SYS-5-CONFIG_I: Configured from console by console
+
+SW1#show ip access-lists
+Extended IP access list vty_acl
+    10 permit tcp host 192.168.0.100 any eq 22 (2 match(es))
+    20 deny ip any any
+
+SW1#
+```
+</details>
 
 ---
 
