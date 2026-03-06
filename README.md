@@ -348,7 +348,7 @@ SW1#
 
 #### 4.2 Protect management access with an ACL
 
-Adding an ACL to the management access of the switch reduces the risk of unauthorized access. In the example below only the host 192.168.0.100 is allowed to reach the management interface of the switch using TCP protocol and port 22.
+Adding an ACL to the management access of the switch reduces the risk of unauthorized access. In the example below only the host $${\color{yellow}192.168.0.100}$$ is allowed to reach the management interface of the switch using TCP protocol and port 22.
 
 ``` pascal
 ip access-list extended vty_acl
@@ -1059,12 +1059,12 @@ Switch(config-ext-nacl)#
 |  8   | SHA-256                                     |    Difficult     | $${\color{green}Recommended}$$                                                 |
 |  9   | Scrypt                                      |    Difficult     | Not NIST approved                                                              |
 
-- hashcat parameters:
+- hashcat usage for Cisco devices:
 	- Type 5 (dictionary)
 ```
 hashcat -a 0 -m 500 '$1$mERr$/x9VUDEedbClBAt8DhbGj0' rockyou.txt
 ```
-- Type 5 (bruteforce)
+	- Type 5 (bruteforce)
 ```
 hashcat -a 3 -m 500 '$1$mERr$/x9VUDEedbClBAt8DhbGj0'
 ```
